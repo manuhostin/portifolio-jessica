@@ -1,13 +1,14 @@
 <template>
-<header>
-<nav>
-  <a href="" class="logo">Jess Wilbert</a>
-  <div class="links">
-    <a href="">SOBRE</a>
-    <a href="">CONTATO</a>
-  </div>
-</nav>
-</header>
+  <header>
+    <nav>
+      <router-link to="/" class="logo">Jess Wilbert</router-link>
+
+      <div class="links">
+        <router-link to="/sobre">SOBRE</router-link>
+        <router-link to="/contato">CONTATO</router-link>
+      </div>
+    </nav>
+  </header>
 </template>
 
 <style>
