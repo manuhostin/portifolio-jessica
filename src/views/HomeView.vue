@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 
 const allModules = import.meta.glob(
 	[
-		'../assets/imagens/*/*.{png,jpg,jpeg,JPG,JPEG,webp,avif}',
+		'../assets/imagens/*/*.{png,jpg,jpeg,JPG,JPEG,webp,avif,svg,SVG}',
 		'!../assets/imagens/**/*#*',
 		'!../assets/imagens/**/*[[]*',
 	],
@@ -21,6 +21,21 @@ const tabs = [
 ]
 
 const excludedFolders = new Set(['ARTEDIGITAL', 'FLUXOGAMA', 'TRICOSTURA', 'DOMEN', 'CONNECTBOX'])
+
+const folderDescriptions = {
+	'121 SHOP': 'Apresentacao comercial da 121 Smart Shop com pecas para feed, stories e materiais institucionais.',
+	ACOCERTO: 'Campanhas e materiais visuais para comunicacao da AcoCerto em diferentes formatos digitais.',
+	CARDIONUTRI: 'Conteudos visuais para comunicacao de servicos e autoridade da marca CardioNutri.',
+	CBG: 'Pecas de identidade e publicacoes para fortalecimento da presenca digital da marca CBG.',
+	HAPO: 'Materiais graficos para campanhas e comunicacao de marca com foco em clareza visual.',
+	KREMKE: 'Conjunto de artes para posicionamento de marca e divulgacao de produtos.',
+	LADIMAS: 'Design de comunicacao para redes sociais e materiais promocionais da Ladimas.',
+	LOGCERTO: 'Colecao de pecas criativas para comunicacao digital e fortalecimento institucional.',
+	MENEGOTTI: 'Materiais visuais para campanhas sazonais, institucionais e promocionais da Menegotti.',
+	MESAVILLE: 'Artes para feed e campanhas de conversao com linguagem visual consistente.',
+	MULTIVISI: 'Pecas de comunicacao visual para performance digital e reconhecimento da marca.',
+	SOLIDUZ: 'Identidade e pecas graficas para comunicacao de servicos e captacao de clientes.',
+}
 
 function normalizeFolderName(name) {
 	return name.replace(/\s+/g, '').toUpperCase()
@@ -88,6 +103,10 @@ const selectedImage = ref(null)
 const modalOpen = ref(false)
 
 const tabHasContent = computed(() => activeTab.value === 'design' && designFolders.length > 0)
+const selectedFolderDescription = computed(() => {
+	if (!selectedFolder.value) return ''
+	return folderDescriptions[selectedFolder.value.name] || 'Descricao em atualizacao.'
+})
 
 function openFolder(folder) {
 	selectedFolder.value = folder
@@ -156,7 +175,7 @@ function selectImage(image) {
 					<aside class="modal-sidebar">
 						<div class="modal-info">
 							<h2>{{ selectedFolder.name }}</h2>
-							<p>{{ selectedImage.title }}</p>
+							<p>{{ selectedFolderDescription }}</p>
 						</div>
 
 						<div class="thumbs-grid">
