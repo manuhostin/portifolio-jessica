@@ -13,6 +13,11 @@ const allModules = import.meta.glob(
 	}
 )
 
+const videoModules = import.meta.glob('../assets/imagens/Videos Gif/*.{gif,GIF}', {
+	eager: true,
+	import: 'default',
+})
+
 const tabs = [
 	{ id: 'ilustracoes', label: 'Ilustração Digital' },
 	{ id: 'videos', label: 'Vídeos' },
@@ -24,7 +29,7 @@ const excludedFolders = new Set(['ARTEDIGITAL', 'FLUXOGAMA', 'TRICOSTURA', 'DOME
 const brandingOnlyFolders = new Set(['CONNECTBOX', 'DOMEN', 'TRICOSTURA', 'FLUXOGAMA'])
 
 const folderDescriptions = {
-	'Ilustração Digital': 'Colecao de artes autorais e estudos visuais desenvolvidos em ilustracao digital.',
+	'Ilustração Digital': 'Colecao de artes autorais e estudos visuais desenvolvidos em ilustracao digital utilizando Photoshop, muitos no Instituto Belas Artes para ensino de alunos ou exosições. ',
 	'121 SHOP': 'Apresentacao comercial da 121 Smart Shop com pecas para feed, stories e materiais institucionais.',
 	ACOCERTO: 'Campanhas e materiais visuais para comunicacao da AcoCerto em diferentes formatos digitais.',
 	CARDIONUTRI: 'Conteudos visuais para comunicacao de servicos e autoridade da marca CardioNutri.',
@@ -41,6 +46,45 @@ const folderDescriptions = {
 	DOMEN: 'Pecas de marca e comunicacao institucional para fortalecer a presenca da Domen.',
 	TRICOSTURA: 'Materiais de branding aplicados em redes sociais e campanhas de divulgacao.',
 	FLUXOGAMA: 'Colecao visual de branding e comunicacao para consolidacao da identidade Fluxogama.',
+	'RD Summit': 'Colecao de GIFs e motion pieces criados para campanhas e divulgacao do RD Summit.',
+	'Mercadão dos Óculos': 'Animacoes promocionais desenvolvidas para campanhas sazonais da rede.',
+	Univille: 'Sequencia de videos curtos em GIF para divulgacao institucional e promocional.',
+	Kremke: 'Conteudos em motion para apresentacao institucional e cobertura de eventos.',
+	Tricostura: 'Animacoes de marca e vinhetas para reforco de identidade visual.',
+	Ladimas: 'Pecas em GIF para comunicacao digital e campanhas de engajamento.',
+	'121 Shop': 'Videos e GIFs de apoio comercial e divulgacao de servicos.',
+}
+
+const folderVideoLinks = {
+	'121 Shop': ['https://drive.google.com/file/d/1JXokPPKISTa6AMhzgt1WoCMGv9aj_DGw/view'],
+	Kremke: [
+		'https://drive.google.com/file/d/1lP7cBuevdIiwMjuzqMSyq7ttr9WkNYNp/view',
+		'https://drive.google.com/file/d/1nnvzFxnvvEv5tAt71j4yHcstj_bH94R4/view',
+		'https://drive.google.com/file/d/1GRVscwtaZxrtuFROeHnDPZYxifIZapEj/view',
+		'https://drive.google.com/file/d/1gbIEU2A2LXlT6rT5qhGPb8aAQlw8ysht/view',
+	],
+	Tricostura: ['https://drive.google.com/file/d/1_SSx8AFNL0Krme4P13o17yEAlaegVaGG/view'],
+	'Mercadão dos Óculos': [
+		'https://drive.google.com/file/d/1K8zg9tNd3rI6mxFGUxw5qWph87MWbBIS/view?usp=sharing',
+		'https://drive.google.com/file/d/1K8zg9tNd3rI6mxFGUxw5qWph87MWbBIS/view?usp=sharing',
+	],
+	'RD Summit': [
+		'https://drive.google.com/file/d/1svPeRPgtw9ZEn6sUotPr639EJszkiwxB/view?usp=sharing',
+		'https://drive.google.com/file/d/1aloThi7C_TZ1fPDwHQaeHqmSPXv3D6PX/view?usp=sharing',
+		'https://drive.google.com/file/d/1Z9s4nwa0UMZIidBU8pr4kHWk0rKniB_G/view?usp=sharing',
+		'https://drive.google.com/file/d/1nDe_Jgv-fOUR-mlFL7wxO-A23feWDNBo/view?usp=sharing',
+		'https://drive.google.com/file/d/18svT68MnN-3aYECflBaG7qolPGIS_a1E/view?usp=sharing',
+	],
+	Univille: [
+		'https://drive.google.com/file/d/1zi5bH9hV3ve1e0WtjoBqXblG_3eRCPLB/view?usp=sharing',
+		'https://drive.google.com/file/d/122wAB_GXtc9Z8udwjai17CVLgsE8a6Y7/view?usp=sharing',
+		'https://drive.google.com/file/d/1JDJgb0z-ZVClr2k3vsjtvi36f3XPY6Qf/view?usp=sharing',
+	],
+	Ladimas: [
+		'https://drive.google.com/file/d/1hj4sN30deFdLnxL6UGFYRHkWHInbFilv/view?usp=drive_link',
+		'https://drive.google.com/file/d/1AbEQccoGc0JnOHO3avdXR6KjjAbrDvaJ/view?usp=drive_link',
+		'https://drive.google.com/file/d/1VN5uC0zreAnZiG0Mw6h8HWxUcxzwmLiJ/view?usp=drive_link',
+	],
 }
 
 const illustrationTitlesByFile = {
@@ -60,6 +104,16 @@ const illustrationTitlesByFile = {
 
 function normalizeFolderName(name) {
 	return name.replace(/\s+/g, '').toUpperCase()
+}
+
+function normalizeText(text) {
+	return text
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[_-]+/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim()
+		.toUpperCase()
 }
 
 function formatLabel(text) {
@@ -100,6 +154,51 @@ const illustrationImages = rawImages
 		title: illustrationTitlesByFile[image.fileName] || image.title,
 	}))
 	.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
+
+function getVideoGroupName(fileName) {
+	const normalized = normalizeText(fileName)
+
+	if (normalized.includes('RD SUMMIT')) return 'RD Summit'
+	if (normalized.includes('MERCADAO') && normalized.includes('OCULOS')) return 'Mercadão dos Óculos'
+	if (normalized.includes('UNIVILLE')) return 'Univille'
+	if (normalized.includes('KRENKE')) return 'Kremke'
+	if (normalized.includes('TRICOSTURA')) return 'Tricostura'
+	if (normalized.includes('LADIMAS')) return 'Ladimas'
+	if (normalized.includes('121')) return '121 Shop'
+
+	return 'Outros'
+}
+
+const videoFolders = Object.values(
+	Object.entries(videoModules).reduce((acc, [path, src]) => {
+		const fileName = path.split('/').pop() || ''
+		const groupName = getVideoGroupName(fileName)
+
+		if (!acc[groupName]) {
+			acc[groupName] = {
+				id: `videos-${normalizeFolderName(groupName).toLowerCase()}`,
+				name: groupName,
+				images: [],
+			}
+		}
+
+		acc[groupName].images.push({
+			id: path,
+			folder: 'Videos Gif',
+			fileName,
+			src,
+			title: formatImageTitle(fileName),
+		})
+
+		return acc
+	}, {})
+)
+	.map((group) => ({
+		...group,
+		images: group.images.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR')),
+		cover: group.images[0] || null,
+	}))
+	.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
 
 function buildFolderCollection(filterFn) {
 	return Object.values(
@@ -142,11 +241,14 @@ const modalOpen = ref(false)
 const currentFolders = computed(() => {
 	if (activeTab.value === 'design') return designFolders
 	if (activeTab.value === 'branding') return brandingFolders
+	if (activeTab.value === 'videos') return videoFolders
 	return []
 })
 
 const tabHasContent = computed(
-	() => (activeTab.value === 'design' || activeTab.value === 'branding') && currentFolders.value.length > 0
+	() =>
+		(activeTab.value === 'design' || activeTab.value === 'branding' || activeTab.value === 'videos') &&
+		currentFolders.value.length > 0
 )
 
 const activeTabLabel = computed(() => tabs.find((tab) => tab.id === activeTab.value)?.label || 'Categoria')
@@ -159,6 +261,11 @@ const illustrationFolder = computed(() => ({
 const selectedFolderDescription = computed(() => {
 	if (!selectedFolder.value) return ''
 	return folderDescriptions[selectedFolder.value.name] || 'Descricao em atualizacao.'
+})
+
+const selectedFolderVideoLinks = computed(() => {
+	if (!selectedFolder.value) return []
+	return folderVideoLinks[selectedFolder.value.name] || []
 })
 
 function openFolder(folder) {
@@ -199,7 +306,7 @@ function selectImage(image) {
 			</button>
 		</section>
 
-		<section v-if="activeTab === 'design' || activeTab === 'branding'" class="cards-grid">
+		<section v-if="activeTab === 'design' || activeTab === 'branding' || activeTab === 'videos'" class="cards-grid">
 			<article
 				v-for="folder in currentFolders"
 				:key="folder.id"
@@ -254,6 +361,13 @@ function selectImage(image) {
 						<div class="modal-info">
 							<h2>{{ selectedFolder.name }}</h2>
 							<p>{{ selectedFolderDescription }}</p>
+							<ul v-if="selectedFolderVideoLinks.length" class="video-links">
+								<li v-for="(link, index) in selectedFolderVideoLinks" :key="link + index">
+									<a :href="link" target="_blank" rel="noopener noreferrer">
+										Ver video completo {{ index + 1 }}
+									</a>
+								</li>
+							</ul>
 						</div>
 
 						<div class="thumbs-grid">
@@ -479,6 +593,27 @@ function selectImage(image) {
 	color: #b3b3b3;
 	font-size: 0.92rem;
 	line-height: 1.5;
+}
+
+.video-links {
+	margin: 12px 0 0;
+	padding-left: 18px;
+	display: grid;
+	gap: 6px;
+}
+
+.video-links li {
+	color: #9f9f9f;
+	font-size: 0.9rem;
+}
+
+.video-links a {
+	color: #8ec8ff;
+	text-decoration: none;
+}
+
+.video-links a:hover {
+	text-decoration: underline;
 }
 
 .thumbs-grid {
