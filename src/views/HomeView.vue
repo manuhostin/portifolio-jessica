@@ -21,8 +21,10 @@ const tabs = [
 ]
 
 const excludedFolders = new Set(['ARTEDIGITAL', 'FLUXOGAMA', 'TRICOSTURA', 'DOMEN', 'CONNECTBOX'])
+const brandingOnlyFolders = new Set(['CONNECTBOX', 'DOMEN', 'TRICOSTURA', 'FLUXOGAMA'])
 
 const folderDescriptions = {
+	'Ilustração Digital': 'Colecao de artes autorais e estudos visuais desenvolvidos em ilustracao digital.',
 	'121 SHOP': 'Apresentacao comercial da 121 Smart Shop com pecas para feed, stories e materiais institucionais.',
 	ACOCERTO: 'Campanhas e materiais visuais para comunicacao da AcoCerto em diferentes formatos digitais.',
 	CARDIONUTRI: 'Conteudos visuais para comunicacao de servicos e autoridade da marca CardioNutri.',
@@ -35,6 +37,25 @@ const folderDescriptions = {
 	MESAVILLE: 'Artes para feed e campanhas de conversao com linguagem visual consistente.',
 	MULTIVISI: 'Pecas de comunicacao visual para performance digital e reconhecimento da marca.',
 	SOLIDUZ: 'Identidade e pecas graficas para comunicacao de servicos e captacao de clientes.',
+	'CONNECT BOX': 'Projetos de branding e comunicacao visual para posicionamento da Connect Box.',
+	DOMEN: 'Pecas de marca e comunicacao institucional para fortalecer a presenca da Domen.',
+	TRICOSTURA: 'Materiais de branding aplicados em redes sociais e campanhas de divulgacao.',
+	FLUXOGAMA: 'Colecao visual de branding e comunicacao para consolidacao da identidade Fluxogama.',
+}
+
+const illustrationTitlesByFile = {
+	'caranguejo.png': 'Caranguejo',
+	'coelho2.png': 'Coelho',
+	'finalização pintura 3.jpg': 'Retrato',
+	'grunge town storie.jpg': 'Grunge Town I',
+	'grungetown2 storie.jpg': 'Grunge Town II',
+	'Jessica Wilbert.jpg': 'Retrato',
+	'lava girl 2.jpg': 'Neon',
+	'macaco.jpg': 'Macaco',
+	'Moça (1).jpg': 'Retrato',
+	'SérgioFinal1.jpg': 'Cena',
+	'tigre short (1).jpg': 'Tigre',
+	'vaca.jpg': 'Vaca',
 }
 
 function normalizeFolderName(name) {
@@ -72,37 +93,69 @@ const rawImages = Object.entries(allModules)
 	})
 	.filter(Boolean)
 
-const designFolders = Object.values(
-	rawImages.reduce((acc, image) => {
-		if (excludedFolders.has(normalizeFolderName(image.folder))) {
-			return acc
-		}
-
-		if (!acc[image.folder]) {
-			acc[image.folder] = {
-				id: image.folder.toLowerCase().replace(/\s+/g, '-'),
-				name: formatLabel(image.folder),
-				images: [],
-			}
-		}
-
-		acc[image.folder].images.push(image)
-		return acc
-	}, {})
-)
-	.map((folder) => ({
-		...folder,
-		images: folder.images.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR')),
-		cover: folder.images[0] || null,
+const illustrationImages = rawImages
+	.filter((image) => normalizeFolderName(image.folder) === 'ARTEDIGITAL')
+	.map((image) => ({
+		...image,
+		title: illustrationTitlesByFile[image.fileName] || image.title,
 	}))
-	.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+	.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
+
+function buildFolderCollection(filterFn) {
+	return Object.values(
+		rawImages.reduce((acc, image) => {
+			if (!filterFn(image)) {
+				return acc
+			}
+
+			if (!acc[image.folder]) {
+				acc[image.folder] = {
+					id: image.folder.toLowerCase().replace(/\s+/g, '-'),
+					name: formatLabel(image.folder),
+					images: [],
+				}
+			}
+
+			acc[image.folder].images.push(image)
+			return acc
+		}, {})
+	)
+		.map((folder) => ({
+			...folder,
+			images: folder.images.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR')),
+			cover: folder.images[0] || null,
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+}
+
+const designFolders = buildFolderCollection((image) => !excludedFolders.has(normalizeFolderName(image.folder)))
+
+const brandingFolders = buildFolderCollection((image) =>
+	brandingOnlyFolders.has(normalizeFolderName(image.folder))
+)
 
 const activeTab = ref('design')
 const selectedFolder = ref(null)
 const selectedImage = ref(null)
 const modalOpen = ref(false)
 
-const tabHasContent = computed(() => activeTab.value === 'design' && designFolders.length > 0)
+const currentFolders = computed(() => {
+	if (activeTab.value === 'design') return designFolders
+	if (activeTab.value === 'branding') return brandingFolders
+	return []
+})
+
+const tabHasContent = computed(
+	() => (activeTab.value === 'design' || activeTab.value === 'branding') && currentFolders.value.length > 0
+)
+
+const activeTabLabel = computed(() => tabs.find((tab) => tab.id === activeTab.value)?.label || 'Categoria')
+
+const illustrationFolder = computed(() => ({
+	id: 'ilustracoes',
+	name: 'Ilustração Digital',
+	images: illustrationImages,
+}))
 const selectedFolderDescription = computed(() => {
 	if (!selectedFolder.value) return ''
 	return folderDescriptions[selectedFolder.value.name] || 'Descricao em atualizacao.'
@@ -111,6 +164,12 @@ const selectedFolderDescription = computed(() => {
 function openFolder(folder) {
 	selectedFolder.value = folder
 	selectedImage.value = folder.images[0] || null
+	modalOpen.value = true
+}
+
+function openIllustration(image) {
+	selectedFolder.value = illustrationFolder.value
+	selectedImage.value = image
 	modalOpen.value = true
 }
 
@@ -140,9 +199,9 @@ function selectImage(image) {
 			</button>
 		</section>
 
-		<section v-if="activeTab === 'design'" class="cards-grid">
+		<section v-if="activeTab === 'design' || activeTab === 'branding'" class="cards-grid">
 			<article
-				v-for="folder in designFolders"
+				v-for="folder in currentFolders"
 				:key="folder.id"
 				class="folder-card"
 				@click="openFolder(folder)"
@@ -154,7 +213,26 @@ function selectImage(image) {
 				</div>
 			</article>
 
-			<p v-if="!tabHasContent" class="empty-state">Nenhuma pasta encontrada para Design Gráfico.</p>
+			<p v-if="!tabHasContent" class="empty-state">Nenhuma pasta encontrada para {{ activeTabLabel }}.</p>
+		</section>
+
+		<section v-else-if="activeTab === 'ilustracoes'" class="cards-grid">
+			<article
+				v-for="image in illustrationImages"
+				:key="image.id"
+				class="folder-card"
+				@click="openIllustration(image)"
+			>
+				<img :src="image.src" :alt="image.title" class="card-image" />
+				<div class="card-overlay">
+					<h2>{{ image.title }}</h2>
+					<span>Arte</span>
+				</div>
+			</article>
+
+			<p v-if="!illustrationImages.length" class="empty-state">
+				Nenhuma imagem encontrada para Ilustração Digital.
+			</p>
 		</section>
 
 		<section v-else class="cards-grid">
