@@ -144,26 +144,34 @@ function selectImage(image) {
 
 		<div v-if="modalOpen && selectedFolder && selectedImage" class="modal-backdrop" @click.self="closeModal">
 			<section class="modal-panel">
-				<button class="close-button" type="button" @click="closeModal">Fechar</button>
-
-				<img :src="selectedImage.src" :alt="selectedImage.title" class="modal-image" />
-
-				<div class="modal-info">
-					<h2>{{ selectedFolder.name }}</h2>
-					<p>{{ selectedImage.title }}</p>
+				<div class="modal-header">
+					<button class="close-button" type="button" @click="closeModal">Fechar</button>
 				</div>
 
-				<div class="thumbs-grid">
-					<button
-						v-for="image in selectedFolder.images"
-						:key="image.id"
-						type="button"
-						class="thumb-button"
-						:class="{ active: selectedImage.id === image.id }"
-						@click="selectImage(image)"
-					>
-						<img :src="image.src" :alt="image.title" />
-					</button>
+				<div class="modal-layout">
+					<div class="modal-viewer">
+						<img :src="selectedImage.src" :alt="selectedImage.title" class="modal-image" />
+					</div>
+
+					<aside class="modal-sidebar">
+						<div class="modal-info">
+							<h2>{{ selectedFolder.name }}</h2>
+							<p>{{ selectedImage.title }}</p>
+						</div>
+
+						<div class="thumbs-grid">
+							<button
+								v-for="image in selectedFolder.images"
+								:key="image.id"
+								type="button"
+								class="thumb-button"
+								:class="{ active: selectedImage.id === image.id }"
+								@click="selectImage(image)"
+							>
+								<img :src="image.src" :alt="image.title" />
+							</button>
+						</div>
+					</aside>
 				</div>
 			</section>
 		</div>
@@ -298,7 +306,9 @@ function selectImage(image) {
 }
 
 .modal-panel {
-	width: min(980px, 100%);
+	width: min(1140px, 100%);
+	max-height: calc(100vh - 48px);
+	overflow: auto;
 	padding: 16px;
 	background: #1b1b1b;
 	border: 1px solid #303030;
@@ -306,55 +316,114 @@ function selectImage(image) {
 	position: relative;
 }
 
+.modal-header {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 10px;
+}
+
+.modal-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 300px;
+	gap: 14px;
+	align-items: stretch;
+}
+
+.modal-viewer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #111;
+	border: 1px solid #2f2f2f;
+	border-radius: 12px;
+	padding: 10px;
+	min-height: min(72vh, 720px);
+}
+
 .modal-image {
 	width: 100%;
-	max-height: 62vh;
+	max-height: min(68vh, 700px);
 	object-fit: contain;
+	object-position: center center;
 	display: block;
 	border-radius: 10px;
 	background: #0f0f0f;
 }
 
-.modal-info {
-	margin-top: 14px;
-	padding: 14px;
-	border: 1px solid #303030;
+.modal-sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	max-height: calc(100vh - 120px);
+	padding: 10px;
+	border: 1px solid #2e2e2e;
 	border-radius: 12px;
-	background: #161616;
+	background: linear-gradient(180deg, #1d1d1d 0%, #141414 100%);
+}
+
+.modal-info {
+	padding: 14px;
+	border: 1px solid #3a3a3a;
+	border-radius: 12px;
+	background: rgba(10, 10, 10, 0.45);
+	backdrop-filter: blur(2px);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .modal-info h2 {
 	margin: 0;
-	font-size: 1.1rem;
+	font-size: 1.04rem;
 	font-weight: 600;
+	letter-spacing: 0.01em;
 }
 
 .modal-info p {
-	margin: 8px 0 0;
-	color: #c5c5c5;
+	margin: 10px 0 0;
+	color: #b3b3b3;
+	font-size: 0.92rem;
 	line-height: 1.5;
 }
 
 .thumbs-grid {
-	margin-top: 14px;
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(2, 1fr);
 	gap: 10px;
+	overflow: auto;
+	padding-right: 4px;
+}
+
+.thumbs-grid::-webkit-scrollbar {
+	width: 8px;
+}
+
+.thumbs-grid::-webkit-scrollbar-track {
+	background: #111;
+	border-radius: 99px;
+}
+
+.thumbs-grid::-webkit-scrollbar-thumb {
+	background: #3f3f3f;
+	border-radius: 99px;
 }
 
 .thumb-button {
-	padding: 4px;
-	border: 1px solid #303030;
-	background: #1a1a1a;
+	padding: 5px;
+	border: 1px solid #353535;
+	background: #181818;
 	border-radius: 10px;
 	cursor: pointer;
-	transition: border-color 0.2s ease, transform 0.2s ease;
+	transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .thumb-button:hover,
 .thumb-button.active {
-	border-color: #666;
+	border-color: #7a7a7a;
 	transform: translateY(-2px);
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.thumb-button.active {
+	outline: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .thumb-button img {
@@ -366,9 +435,6 @@ function selectImage(image) {
 }
 
 .close-button {
-	position: absolute;
-	top: 12px;
-	right: 12px;
 	font-family: 'Poppins', sans-serif;
 	border: 1px solid #3f3f3f;
 	background: #262626;
@@ -392,8 +458,24 @@ function selectImage(image) {
 		aspect-ratio: 16 / 9;
 	}
 
+	.modal-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.modal-sidebar {
+		max-height: none;
+	}
+
+	.modal-viewer {
+		min-height: auto;
+	}
+
+	.modal-image {
+		max-height: 55vh;
+	}
+
 	.thumbs-grid {
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 	}
 }
 
@@ -415,6 +497,10 @@ function selectImage(image) {
 
 	.modal-backdrop {
 		padding: 10px;
+	}
+
+	.thumbs-grid {
+		grid-template-columns: repeat(2, 1fr);
 	}
 }
 </style>
