@@ -60,7 +60,7 @@
       </section>
 
       <section class="card-habilidades">
-        <h3>Programas Usados</h3>
+        <h3>Softwares Dominados</h3>
         <div class="tags-container">
           <span class="tag">Adobe Illustrator</span>
           <span class="tag">Adobe Photoshop</span>
