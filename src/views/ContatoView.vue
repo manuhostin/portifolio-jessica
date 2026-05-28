@@ -52,9 +52,9 @@
 			<section class="card-canais">
 				<h2>Outros Canais</h2>
 
-				<a class="canal" href="mailto:jesswilbert.design@gmail.com">
+				<a class="canal" href="mailto:jessica.wilbert@hotmail.com" target="_blank" rel="noopener noreferrer">
 					<span class="canal-titulo">E-mail</span>
-					<span class="canal-detalhe">jesswilbert.design@gmail.com</span>
+					<span class="canal-detalhe">jessica.wilbert@hotmail.com</span>
 				</a>
 
 				<a class="canal" href="https://wa.me/554791888898" target="_blank" rel="noopener noreferrer">
