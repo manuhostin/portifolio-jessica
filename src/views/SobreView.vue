@@ -65,7 +65,7 @@
           <span class="tag">Adobe Illustrator</span>
           <span class="tag">Adobe Photoshop</span>
           <span class="tag">Adobe After Effects</span>
-          <span class="tag">Adobe Premiere</span>
+          <span class="tag">Premiere Pro</span>
           <span class="tag">Adobe Lightroom</span>
         </div>
       </section>
