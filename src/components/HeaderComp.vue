@@ -6,6 +6,8 @@
       <div class="links">
         <router-link to="/sobre">SOBRE</router-link>
         <router-link to="/contato">CONTATO</router-link>
+        <router-link to="/">PROJETOS</router-link>
+
       </div>
     </nav>
   </header>

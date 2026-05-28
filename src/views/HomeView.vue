@@ -35,7 +35,7 @@ const folderDescriptions = {
 	CARDIONUTRI: 'Conteudos visuais para comunicacao de servicos e autoridade da marca CardioNutri.',
 	CBG: 'Pecas de identidade e publicacoes para fortalecimento da presenca digital da marca CBG.',
 	HAPO: 'Materiais graficos para campanhas e comunicacao de marca com foco em clareza visual.',
-	KREMKE: 'Conjunto de artes para posicionamento de marca e divulgacao de produtos.',
+	Krenke: 'Conjunto de artes para posicionamento de marca e divulgacao de produtos.',
 	LADIMAS: 'Design de comunicacao para redes sociais e materiais promocionais da Ladimas.',
 	LOGCERTO: 'Colecao de pecas criativas para comunicacao digital e fortalecimento institucional.',
 	MENEGOTTI: 'Materiais visuais para campanhas sazonais, institucionais e promocionais da Menegotti.',
@@ -49,7 +49,7 @@ const folderDescriptions = {
 	'RD Summit': 'Colecao de GIFs e motion pieces criados para campanhas e divulgacao do RD Summit.',
 	'Mercadão dos Óculos': 'Animacoes promocionais desenvolvidas para campanhas sazonais da rede.',
 	Univille: 'Sequencia de videos curtos em GIF para divulgacao institucional e promocional.',
-	Kremke: 'Conteudos em motion para apresentacao institucional e cobertura de eventos.',
+	Krenke: 'Conteudos em motion para apresentacao institucional e cobertura de eventos.',
 	Tricostura: 'Animacoes de marca e vinhetas para reforco de identidade visual.',
 	Ladimas: 'Pecas em GIF para comunicacao digital e campanhas de engajamento.',
 	'121 Shop': 'Videos e GIFs de apoio comercial e divulgacao de servicos.',
@@ -57,7 +57,7 @@ const folderDescriptions = {
 
 const folderVideoLinks = {
 	'121 Shop': ['https://drive.google.com/file/d/1JXokPPKISTa6AMhzgt1WoCMGv9aj_DGw/view'],
-	Kremke: [
+	Krenke: [
 		'https://drive.google.com/file/d/1lP7cBuevdIiwMjuzqMSyq7ttr9WkNYNp/view',
 		'https://drive.google.com/file/d/1nnvzFxnvvEv5tAt71j4yHcstj_bH94R4/view',
 		'https://drive.google.com/file/d/1GRVscwtaZxrtuFROeHnDPZYxifIZapEj/view',
@@ -117,7 +117,11 @@ function normalizeText(text) {
 }
 
 function formatLabel(text) {
-	return text.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+	const formatted = text.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim()
+
+	if (formatted.toUpperCase() === 'KREMKE') return 'Krenke'
+
+	return formatted
 }
 
 function formatImageTitle(fileName) {
@@ -161,7 +165,7 @@ function getVideoGroupName(fileName) {
 	if (normalized.includes('RD SUMMIT')) return 'RD Summit'
 	if (normalized.includes('MERCADAO') && normalized.includes('OCULOS')) return 'Mercadão dos Óculos'
 	if (normalized.includes('UNIVILLE')) return 'Univille'
-	if (normalized.includes('KRENKE')) return 'Kremke'
+	if (normalized.includes('KRENKE')) return 'Krenke'
 	if (normalized.includes('TRICOSTURA')) return 'Tricostura'
 	if (normalized.includes('LADIMAS')) return 'Ladimas'
 	if (normalized.includes('121')) return '121 Shop'
