@@ -1,13 +1,25 @@
+<script setup>
+import { useLanguageStore } from '../stores/language'
+
+const languageStore = useLanguageStore()
+
+function toggleLanguage() {
+  languageStore.setLanguage(languageStore.isEnglish ? 'pt' : 'en')
+}
+</script>
+
 <template>
   <header>
     <nav>
       <router-link to="/" class="logo">Jess Wilbert</router-link>
 
       <div class="links">
-        <router-link to="/sobre">SOBRE</router-link>
-        <router-link to="/contato">CONTATO</router-link>
-        <router-link to="/">PROJETOS</router-link>
-
+        <router-link to="/sobre">{{ languageStore.t('header.about') }}</router-link>
+        <router-link to="/contato">{{ languageStore.t('header.contact') }}</router-link>
+        <router-link to="/">{{ languageStore.t('header.projects') }}</router-link>
+        <button class="lang-toggle" type="button" @click="toggleLanguage">
+          {{ languageStore.isEnglish ? 'PT' : 'EN' }}
+        </button>
       </div>
     </nav>
   </header>
@@ -23,24 +35,40 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .logo {
   font-weight: 300;
   margin-right: 0;
 }
-a {
+a,
+.lang-toggle {
   display: inline-block;
   color: #fff;
   text-decoration: none;
-  margin-right: 1rem;
   font-family: Poppins, sans-serif;
   transition: color 0.3s ease;
 }
 
-a:hover {
+.lang-toggle {
+  border: 1px solid #4f4f4f;
+  background: transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+a:hover,
+.lang-toggle:hover {
   color: #bbbbbb;
 }
 </style>
-
-<script setup></script>

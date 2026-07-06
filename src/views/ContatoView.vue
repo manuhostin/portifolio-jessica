@@ -1,16 +1,55 @@
+<script setup>
+import { ref } from 'vue'
+import { useLanguageStore } from '../stores/language'
+
+const languageStore = useLanguageStore()
+const enviando = ref(false)
+const mensagemStatus = ref('')
+const statusTipo = ref('')
+
+async function enviarFormulario(event) {
+	const form = event.target
+	const formData = new FormData(form)
+
+	enviando.value = true
+	mensagemStatus.value = ''
+	statusTipo.value = ''
+
+	try {
+		const response = await fetch('https://api.web3forms.com/submit', {
+			method: 'POST',
+			body: formData,
+		})
+
+		const result = await response.json()
+
+		if (response.ok && result.success) {
+			mensagemStatus.value = languageStore.t('contact.statusSuccess')
+			statusTipo.value = 'status-sucesso'
+			form.reset()
+		} else {
+			mensagemStatus.value = languageStore.t('contact.statusError')
+			statusTipo.value = 'status-erro'
+		}
+	} catch {
+		mensagemStatus.value = languageStore.t('contact.statusConnection')
+		statusTipo.value = 'status-erro'
+	} finally {
+		enviando.value = false
+	}
+}
+</script>
+
 <template>
 	<main class="contato">
 		<div class="contato-content">
 			<section class="card-intro">
-				<h1>Contato</h1>
-				<p>
-					Me envie uma mensagem para orçamentos, parcerias ou dúvidas. Você pode falar comigo pelo
-					formulário, e-mail, WhatsApp ou Instagram.
-				</p>
+				<h1>{{ languageStore.t('contact.title') }}</h1>
+				<p>{{ languageStore.t('contact.intro') }}</p>
 			</section>
 
 			<section class="card-formulario">
-				<h2>Formulário de Contato</h2>
+				<h2>{{ languageStore.t('contact.formTitle') }}</h2>
 
 				<form class="formulario" @submit.prevent="enviarFormulario">
 					<input type="hidden" name="access_key" value="f1c28cf4-b99a-4397-97a8-e8ea54f4d120" />
@@ -18,29 +57,17 @@
 					<input type="hidden" name="from_name" value="Portfolio Jess Wilbert" />
 					<input type="checkbox" name="botcheck" class="hidden-botcheck" tabindex="-1" autocomplete="off" />
 
-					<label for="nome">Nome</label>
-					<input id="nome" name="Nome" type="text" placeholder="Seu nome" required />
+					<label for="nome">{{ languageStore.t('contact.nameLabel') }}</label>
+					<input id="nome" name="Nome" type="text" :placeholder="languageStore.t('contact.namePlaceholder')" required />
 
-					<label for="email">E-mail</label>
-					<input
-						id="email"
-						name="Email"
-						type="email"
-						placeholder="seuemail@exemplo.com"
-						required
-					/>
+					<label for="email">{{ languageStore.t('contact.emailLabel') }}</label>
+					<input id="email" name="Email" type="email" :placeholder="languageStore.t('contact.emailPlaceholder')" required />
 
-					<label for="mensagem">Mensagem</label>
-					<textarea
-						id="mensagem"
-						name="Mensagem"
-						rows="6"
-						placeholder="Escreva sua mensagem"
-						required
-					></textarea>
+					<label for="mensagem">{{ languageStore.t('contact.messageLabel') }}</label>
+					<textarea id="mensagem" name="Mensagem" rows="6" :placeholder="languageStore.t('contact.messagePlaceholder')" required></textarea>
 
 					<button type="submit" :disabled="enviando">
-						{{ enviando ? 'Enviando...' : 'Enviar mensagem' }}
+						{{ enviando ? languageStore.t('contact.sending') : languageStore.t('contact.submit') }}
 					</button>
 
 					<p v-if="mensagemStatus" class="status-mensagem" :class="statusTipo">
@@ -50,7 +77,7 @@
 			</section>
 
 			<section class="card-canais">
-				<h2>Outros Canais</h2>
+				<h2>{{ languageStore.t('contact.otherChannels') }}</h2>
 
 				<a class="canal" href="mailto:jessica.wilbert@hotmail.com" target="_blank" rel="noopener noreferrer">
 					<span class="canal-titulo">E-mail</span>
@@ -76,46 +103,6 @@
 		</div>
 	</main>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-
-const enviando = ref(false)
-const mensagemStatus = ref('')
-const statusTipo = ref('')
-
-async function enviarFormulario(event) {
-	const form = event.target
-	const formData = new FormData(form)
-
-	enviando.value = true
-	mensagemStatus.value = ''
-	statusTipo.value = ''
-
-	try {
-		const response = await fetch('https://api.web3forms.com/submit', {
-			method: 'POST',
-			body: formData,
-		})
-
-		const result = await response.json()
-
-		if (response.ok && result.success) {
-			mensagemStatus.value = 'MENSAGEM ENVIADA COM SUESSO!'
-			statusTipo.value = 'status-sucesso'
-			form.reset()
-		} else {
-			mensagemStatus.value = 'Nao foi possivel enviar agora. Tente novamente.'
-			statusTipo.value = 'status-erro'
-		}
-	} catch {
-		mensagemStatus.value = 'Erro de conexao. Tente novamente.'
-		statusTipo.value = 'status-erro'
-	} finally {
-		enviando.value = false
-	}
-}
-</script>
 
 <style scoped>
 .contato {

@@ -1,25 +1,18 @@
+<script setup>
+import { useLanguageStore } from '../stores/language'
+
+const languageStore = useLanguageStore()
+</script>
+
 <template>
   <main class="sobre">
     <div class="sobre-content">
       <section class="intro">
         <div class="texto">
           <p class="bio"><strong>Jess Wilbert</strong></p>
-          <p class="bio">
-            Designer e diretora de arte com mais de 15 anos de experiência na área criativa, atuando
-            com comunicação visual, ilustração e motion design.
-          </p>
-          <p class="bio2">
-            Desenvolvo materiais digitais e peças audiovisuais que unem
-            <strong>estética, clareza e impacto visual</strong>, com atenção aos detalhes técnicos e
-            consistência nas entregas.
-          </p>
-
-          <p class="bio2">
-            Com perfil <strong>multidisciplinar e fluência em inglês</strong>, tenho experiência em
-            colaborar com <strong>equipes e projetos de diferentes áreas e escalas</strong>,
-            garantindo resultados
-            <strong>visualmente sólidos, criativos e alinhados ao propósito de cada marca</strong>.
-          </p>
+          <p class="bio">{{ languageStore.t('about.bio1') }}</p>
+          <p class="bio2">{{ languageStore.t('about.bio2') }}</p>
+          <p class="bio2">{{ languageStore.t('about.bio3') }}</p>
         </div>
       </section>
 
@@ -27,40 +20,30 @@
         <div class="card-texto">
           <div class="titulo-container">
             <font-awesome-icon :icon="['fas', 'eye']" class="icon-titulo" />
-            <h3>Direção de Arte & Criação Visual</h3>
+            <h3>{{ languageStore.t('about.card1Title') }}</h3>
           </div>
-          <p>
-            Visão estética apurada, atenção aos detalhes e forte domínio dos critérios técnicos e
-            criativos. Tenho facilidade em tomar decisões visuais com segurança.
-          </p>
+          <p>{{ languageStore.t('about.card1Text') }}</p>
         </div>
 
         <div class="card-texto">
           <div class="titulo-container">
             <font-awesome-icon :icon="['fas', 'comment']" class="icon-titulo" />
-            <h3>Comunicação com Clientes</h3>
+            <h3>{{ languageStore.t('about.card2Title') }}</h3>
           </div>
-          <p>
-            Experiência em traduzir ideias em propostas visuais claras e bem argumentadas. Tenho boa
-            escuta e empatia para criar conexões de confiança.
-          </p>
+          <p>{{ languageStore.t('about.card2Text') }}</p>
         </div>
 
         <div class="card-texto">
           <div class="titulo-container">
             <font-awesome-icon :icon="['fas', 'users']" class="icon-titulo" />
-            <h3>Agilidade Técnica & Trabalho em Equipes</h3>
+            <h3>{{ languageStore.t('about.card3Title') }}</h3>
           </div>
-          <p>
-            Tenho domínio sólido de ferramentas e softwares e aprendo com facilidade o necessário
-            para o avanço do projeto. No trabalho em equipe, atuo com atenção e abertura,
-            incentivando trocas construtivas e garantindo entregas bem alinhadas e de qualidade.
-          </p>
+          <p>{{ languageStore.t('about.card3Text') }}</p>
         </div>
       </section>
 
       <section class="card-habilidades">
-        <h3>Softwares Dominados</h3>
+        <h3>{{ languageStore.t('about.softwares') }}</h3>
         <div class="tags-container">
           <span class="tag">Adobe Illustrator</span>
           <span class="tag">Adobe Photoshop</span>

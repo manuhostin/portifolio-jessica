@@ -1,5 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useLanguageStore } from '../stores/language'
+
+const languageStore = useLanguageStore()
 
 const allModules = import.meta.glob(
 	[
@@ -18,12 +21,12 @@ const videoModules = import.meta.glob('../assets/imagens/Videos Gif/*.{gif,GIF}'
 	import: 'default',
 })
 
-const tabs = [
-	{ id: 'ilustracoes', label: 'Ilustração Digital' },
-	{ id: 'videos', label: 'Vídeos' },
-	{ id: 'branding', label: 'Branding' },
-	{ id: 'design', label: 'Design Gráfico' },
-]
+const tabs = computed(() => [
+	{ id: 'ilustracoes', label: languageStore.t('home.tabs.digitalIllustration') },
+	{ id: 'videos', label: languageStore.t('home.tabs.videos') },
+	{ id: 'branding', label: languageStore.t('home.tabs.branding') },
+	{ id: 'design', label: languageStore.t('home.tabs.design') },
+])
 
 const excludedFolders = new Set(['ARTEDIGITAL', 'FLUXOGAMA', 'TRICOSTURA', 'DOMEN', 'CONNECTBOX'])
 const brandingOnlyFolders = new Set(['CONNECTBOX', 'DOMEN', 'TRICOSTURA', 'FLUXOGAMA'])
@@ -124,6 +127,30 @@ function formatLabel(text) {
 	return formatted
 }
 
+function normalizeProjectKey(name) {
+	return name
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/[^a-zA-Z0-9]+/g, '')
+		.toLowerCase()
+}
+
+function getProjectTitle(name) {
+	const key = `home.projects.${normalizeProjectKey(name)}.title`
+	const translated = languageStore.t(key)
+
+	return translated === key ? formatLabel(name) : translated
+}
+
+function getProjectDescription(name, rawName) {
+	const keyName = rawName || name
+	const descriptionKey = rawName || name
+	const key = `home.projects.${normalizeProjectKey(keyName)}.description`
+	const translated = languageStore.t(key)
+
+	return translated === key ? folderDescriptions[descriptionKey] || languageStore.t('home.descriptionUpdating') : translated
+}
+
 function formatImageTitle(fileName) {
 	return fileName
 		.replace(/\.[^.]+$/, '')
@@ -181,7 +208,8 @@ const videoFolders = Object.values(
 		if (!acc[groupName]) {
 			acc[groupName] = {
 				id: `videos-${normalizeFolderName(groupName).toLowerCase()}`,
-				name: groupName,
+				name: getProjectTitle(groupName),
+				rawName: groupName,
 				images: [],
 			}
 		}
@@ -214,7 +242,8 @@ function buildFolderCollection(filterFn) {
 			if (!acc[image.folder]) {
 				acc[image.folder] = {
 					id: image.folder.toLowerCase().replace(/\s+/g, '-'),
-					name: formatLabel(image.folder),
+					name: getProjectTitle(image.folder),
+					rawName: image.folder,
 					images: [],
 				}
 			}
@@ -255,21 +284,23 @@ const tabHasContent = computed(
 		currentFolders.value.length > 0
 )
 
-const activeTabLabel = computed(() => tabs.find((tab) => tab.id === activeTab.value)?.label || 'Categoria')
+const activeTabLabel = computed(() => tabs.value.find((tab) => tab.id === activeTab.value)?.label || 'Category')
 
 const illustrationFolder = computed(() => ({
 	id: 'ilustracoes',
-	name: 'Ilustração Digital',
+	name: languageStore.t('home.tabs.digitalIllustration'),
+	rawName: 'Ilustração Digital',
 	images: illustrationImages,
 }))
 const selectedFolderDescription = computed(() => {
 	if (!selectedFolder.value) return ''
-	return folderDescriptions[selectedFolder.value.name] || 'Descricao em atualizacao.'
+	return getProjectDescription(selectedFolder.value.name, selectedFolder.value.rawName)
 })
 
 const selectedFolderVideoLinks = computed(() => {
 	if (!selectedFolder.value) return []
-	return folderVideoLinks[selectedFolder.value.name] || []
+	const videoKey = selectedFolder.value.rawName || selectedFolder.value.name
+	return folderVideoLinks[videoKey] || []
 })
 
 function openFolder(folder) {
@@ -297,7 +328,7 @@ function selectImage(image) {
 
 <template>
 	<main class="portfolio-home">
-		<section class="tabs-bar" aria-label="Categorias do portfolio">
+		<section class="tabs-bar" aria-label="Portfolio categories">
 			<button
 				v-for="tab in tabs"
 				:key="tab.id"
@@ -320,11 +351,11 @@ function selectImage(image) {
 				<img v-if="folder.cover" :src="folder.cover.src" :alt="folder.name" class="card-image" />
 				<div class="card-overlay">
 					<h2>{{ folder.name }}</h2>
-					<span>{{ folder.images.length }} imagens</span>
+					<span>{{ languageStore.t('home.imagesCount', { count: folder.images.length }) }}</span>
 				</div>
 			</article>
 
-			<p v-if="!tabHasContent" class="empty-state">Nenhuma pasta encontrada para {{ activeTabLabel }}.</p>
+			<p v-if="!tabHasContent" class="empty-state">{{ languageStore.t('home.noFolderFound', { category: activeTabLabel }) }}</p>
 		</section>
 
 		<section v-else-if="activeTab === 'ilustracoes'" class="cards-grid">
@@ -337,23 +368,23 @@ function selectImage(image) {
 				<img :src="image.src" :alt="image.title" class="card-image" />
 				<div class="card-overlay">
 					<h2>{{ image.title }}</h2>
-					<span>Arte</span>
+					<span>{{ languageStore.t('home.art') }}</span>
 				</div>
 			</article>
 
 			<p v-if="!illustrationImages.length" class="empty-state">
-				Nenhuma imagem encontrada para Ilustração Digital.
+				{{ languageStore.t('home.illustrationEmpty') }}
 			</p>
 		</section>
 
 		<section v-else class="cards-grid">
-			<p class="empty-state">Categoria pronta para receber conteúdo.</p>
+			<p class="empty-state">{{ languageStore.t('home.emptyCategory') }}</p>
 		</section>
 
 		<div v-if="modalOpen && selectedFolder && selectedImage" class="modal-backdrop" @click.self="closeModal">
 			<section class="modal-panel">
 				<div class="modal-header">
-					<button class="close-button" type="button" @click="closeModal">Fechar</button>
+					<button class="close-button" type="button" @click="closeModal">{{ languageStore.t('home.close') }}</button>
 				</div>
 
 				<div class="modal-layout">
@@ -368,7 +399,7 @@ function selectImage(image) {
 							<ul v-if="selectedFolderVideoLinks.length" class="video-links">
 								<li v-for="(link, index) in selectedFolderVideoLinks" :key="link + index">
 									<a :href="link" target="_blank" rel="noopener noreferrer">
-										Ver video completo {{ index + 1 }}
+										{{ languageStore.t('home.viewFullVideo', { number: index + 1 }) }}
 									</a>
 								</li>
 							</ul>
